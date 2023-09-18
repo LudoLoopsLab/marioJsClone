@@ -64,7 +64,7 @@ const keys = {
   },
 }
 
-
+let scrollOffset = 0
 
 const animate = () => {
   requestAnimationFrame(animate)
@@ -82,11 +82,13 @@ const animate = () => {
   } else {
     player.velocity.x = 0
     if (keys.right.pressed) {
+      scrollOffset += 5
       platforms.forEach(platform => {
         platform.position.x -= 5
       })
 
     } else if (keys.left.pressed) {
+      scrollOffset -= 5
       platforms.forEach(platform => {
         platform.position.x += 5
       })
@@ -100,8 +102,11 @@ const animate = () => {
       player.position.x <= platform.position.x + platform.width) {
       player.velocity.y = 0
     }
-
   })
+
+  if (scrollOffset > 2000) {
+    console.log('you win')
+  }
 }
 
 
