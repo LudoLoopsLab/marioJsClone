@@ -1,6 +1,7 @@
 import hills from '../img/hills.png'
 import background from '../img/background.png'
 import platform from '../img/platform.png'
+import platformSmallTall from '../img/platformSmallTall.png'
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
@@ -11,6 +12,7 @@ const gravity = 1.5
 
 class Player {
   constructor() {
+    this.speed = 10
     this.position = {
       x: 100,
       y: 100
@@ -74,17 +76,10 @@ const createImage = (imageSrc) => {
 }
 
 let platformImage = createImage(platform)
-
+let platformSmallTallImage = createImage(platformSmallTall)
 let player = new Player()
-let platforms = [
-  new Platform({ x: -1, y: 470, image: platformImage }),
-
-  new Platform({ x: platformImage.width - 3, y: 470, image: platformImage }),
-  new Platform({ x: platformImage.width * 2 + 100, y: 470, image: platformImage }),]
-
-let genericObjects = [new GenericObject({ x: -1, y: -1, image: createImage(background) }), new GenericObject({ x: -1, y: -1, image: createImage(hills) }),]
-
-
+let platforms = []
+let genericObjects = []
 
 let scrollOffset = 0
 
@@ -93,12 +88,19 @@ const init = () => {
 
   player = new Player()
   platforms = [
+    new Platform({ x: platformImage.width * 4 + 300 - 2 + platformImage.width - platformSmallTallImage.width, y: 270, image: createImage(platformSmallTall) }),
     new Platform({ x: -1, y: 470, image: platformImage }),
-
     new Platform({ x: platformImage.width - 3, y: 470, image: platformImage }),
-    new Platform({ x: platformImage.width * 2 + 100, y: 470, image: platformImage }),]
+    new Platform({ x: platformImage.width * 2 + 100, y: 470, image: platformImage }),
+    new Platform({ x: platformImage.width * 3 + 300, y: 470, image: platformImage }),
+    new Platform({ x: platformImage.width * 4 + 300 - 2, y: 470, image: platformImage }),
+    new Platform({ x: platformImage.width * 5 + 700 - 2, y: 470, image: platformImage }),
 
-  genericObjects = [new GenericObject({ x: -1, y: -1, image: createImage(background) }), new GenericObject({ x: -1, y: -1, image: createImage(hills) }),]
+  ]
+
+  genericObjects = [
+    new GenericObject({ x: -1, y: -1, image: createImage(background) }),
+    new GenericObject({ x: -1, y: -1, image: createImage(hills) }),]
 
   scrollOffset = 0
 }
@@ -113,6 +115,8 @@ const keys = {
   },
 }
 
+
+init()
 const animate = () => {
   requestAnimationFrame(animate)
   c.fillStyle = 'white'
@@ -128,27 +132,27 @@ const animate = () => {
 
   player.update()
   if (keys.right.pressed && player.position.x < 400) {
-    player.velocity.x = 5
+    player.velocity.x = player.speed
   } else if (keys.left.pressed && player.position.x > 100) {
-    player.velocity.x = -5
+    player.velocity.x = -player.speed
   } else {
     player.velocity.x = 0
 
     if (keys.right.pressed) {
-      scrollOffset += 5
+      scrollOffset += player.speed
       platforms.forEach(platform => {
-        platform.position.x -= 5
+        platform.position.x -= player.speed
       })
       genericObjects.forEach(object => {
-        object.position.x -= 3
+        object.position.x -= player.speed * .66
       })
     } else if (keys.left.pressed) {
-      scrollOffset -= 5
+      scrollOffset -= player.speed
       platforms.forEach(platform => {
-        platform.position.x += 5
+        platform.position.x += player.speed
       })
       genericObjects.forEach(object => {
-        object.position.x += 3
+        object.position.x += player.speed * .66
       })
     }
   }
@@ -164,7 +168,7 @@ const animate = () => {
   })
 
   // win condition
-  if (scrollOffset > 2000) {
+  if (scrollOffset > platformImage.width * 5 + 350 - 2) {
     console.log('you win')
   }
 
@@ -194,9 +198,9 @@ addEventListener('keydown', ({ code }) => {
 
     case 'KeyW':
     case 'ArrowUp':
-
+    case 'Space':
       if (player.velocity.y === 0) {
-        player.velocity.y -= 20
+        player.velocity.y -= 25
       }
       break
 
@@ -222,7 +226,6 @@ addEventListener('keyup', ({ code }) => {
 
     case 'KeyW':
     case 'ArrowUp':
-      player.velocity.y = 0
       break
 
     case 'KeyS':
