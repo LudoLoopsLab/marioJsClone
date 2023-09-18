@@ -125,6 +125,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./src/img/platformSmallTall.png":
+/*!***************************************!*\
+  !*** ./src/img/platformSmallTall.png ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "0587f9be8e442eb74b2fe283bbf1a947.png");
+
+/***/ }),
+
 /***/ "./src/js/canvas.js":
 /*!**************************!*\
   !*** ./src/js/canvas.js ***!
@@ -137,12 +150,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _img_hills_png__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../img/hills.png */ "./src/img/hills.png");
 /* harmony import */ var _img_background_png__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../img/background.png */ "./src/img/background.png");
 /* harmony import */ var _img_platform_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../img/platform.png */ "./src/img/platform.png");
+/* harmony import */ var _img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../img/platformSmallTall.png */ "./src/img/platformSmallTall.png");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 
 
 
@@ -154,6 +169,7 @@ var gravity = 1.5;
 var Player = /*#__PURE__*/function () {
   function Player() {
     _classCallCheck(this, Player);
+    this.speed = 10;
     this.position = {
       x: 100,
       y: 100
@@ -234,34 +250,19 @@ var createImage = function createImage(imageSrc) {
   return image;
 };
 var platformImage = createImage(_img_platform_png__WEBPACK_IMPORTED_MODULE_2__["default"]);
+var platformSmallTallImage = createImage(_img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__["default"]);
 var player = new Player();
-var platforms = [new Platform({
-  x: -1,
-  y: 470,
-  image: platformImage
-}), new Platform({
-  x: platformImage.width - 3,
-  y: 470,
-  image: platformImage
-}), new Platform({
-  x: platformImage.width * 2 + 100,
-  y: 470,
-  image: platformImage
-})];
-var genericObjects = [new GenericObject({
-  x: -1,
-  y: -1,
-  image: createImage(_img_background_png__WEBPACK_IMPORTED_MODULE_1__["default"])
-}), new GenericObject({
-  x: -1,
-  y: -1,
-  image: createImage(_img_hills_png__WEBPACK_IMPORTED_MODULE_0__["default"])
-})];
+var platforms = [];
+var genericObjects = [];
 var scrollOffset = 0;
 var init = function init() {
   platformImage = createImage(_img_platform_png__WEBPACK_IMPORTED_MODULE_2__["default"]);
   player = new Player();
   platforms = [new Platform({
+    x: platformImage.width * 4 + 300 - 2 + platformImage.width - platformSmallTallImage.width,
+    y: 270,
+    image: createImage(_img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__["default"])
+  }), new Platform({
     x: -1,
     y: 470,
     image: platformImage
@@ -271,6 +272,18 @@ var init = function init() {
     image: platformImage
   }), new Platform({
     x: platformImage.width * 2 + 100,
+    y: 470,
+    image: platformImage
+  }), new Platform({
+    x: platformImage.width * 3 + 300,
+    y: 470,
+    image: platformImage
+  }), new Platform({
+    x: platformImage.width * 4 + 300 - 2,
+    y: 470,
+    image: platformImage
+  }), new Platform({
+    x: platformImage.width * 5 + 700 - 2,
     y: 470,
     image: platformImage
   })];
@@ -293,6 +306,7 @@ var keys = {
     pressed: false
   }
 };
+init();
 var animate = function animate() {
   requestAnimationFrame(animate);
   c.fillStyle = 'white';
@@ -305,26 +319,26 @@ var animate = function animate() {
   });
   player.update();
   if (keys.right.pressed && player.position.x < 400) {
-    player.velocity.x = 5;
+    player.velocity.x = player.speed;
   } else if (keys.left.pressed && player.position.x > 100) {
-    player.velocity.x = -5;
+    player.velocity.x = -player.speed;
   } else {
     player.velocity.x = 0;
     if (keys.right.pressed) {
-      scrollOffset += 5;
+      scrollOffset += player.speed;
       platforms.forEach(function (platform) {
-        platform.position.x -= 5;
+        platform.position.x -= player.speed;
       });
       genericObjects.forEach(function (object) {
-        object.position.x -= 3;
+        object.position.x -= player.speed * .66;
       });
     } else if (keys.left.pressed) {
-      scrollOffset -= 5;
+      scrollOffset -= player.speed;
       platforms.forEach(function (platform) {
-        platform.position.x += 5;
+        platform.position.x += player.speed;
       });
       genericObjects.forEach(function (object) {
-        object.position.x += 3;
+        object.position.x += player.speed * .66;
       });
     }
   }
@@ -337,7 +351,7 @@ var animate = function animate() {
   });
 
   // win condition
-  if (scrollOffset > 2000) {
+  if (scrollOffset > platformImage.width * 5 + 350 - 2) {
     console.log('you win');
   }
 
@@ -361,8 +375,9 @@ addEventListener('keydown', function (_ref3) {
       break;
     case 'KeyW':
     case 'ArrowUp':
+    case 'Space':
       if (player.velocity.y === 0) {
-        player.velocity.y -= 20;
+        player.velocity.y -= 25;
       }
       break;
     case 'KeyS':
@@ -383,7 +398,6 @@ addEventListener('keyup', function (_ref4) {
       break;
     case 'KeyW':
     case 'ArrowUp':
-      player.velocity.y = 0;
       break;
     case 'KeyS':
     case 'ArrowDown':
