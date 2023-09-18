@@ -32,10 +32,10 @@ class Player {
     this.position.x += this.velocity.x
     this.position.y += this.velocity.y
 
-
     if (this.position.y + this.height + this.velocity.y <= canvas.height) {
       this.velocity.y += gravity
-    } else this.velocity.y = 0
+    }
+
   }
 }
 
@@ -73,14 +73,36 @@ const createImage = (imageSrc) => {
   return image
 }
 
-const platformImage = createImage(platform)
+let platformImage = createImage(platform)
 
-const player = new Player()
-const platforms = [
+let player = new Player()
+let platforms = [
   new Platform({ x: -1, y: 470, image: platformImage }),
-  new Platform({ x: platformImage.width - 3, y: 470, image: platformImage })]
 
-const genericObjects = [new GenericObject({ x: -1, y: -1, image: createImage(background) }), new GenericObject({ x: -1, y: -1, image: createImage(hills) }),]
+  new Platform({ x: platformImage.width - 3, y: 470, image: platformImage }),
+  new Platform({ x: platformImage.width * 2 + 100, y: 470, image: platformImage }),]
+
+let genericObjects = [new GenericObject({ x: -1, y: -1, image: createImage(background) }), new GenericObject({ x: -1, y: -1, image: createImage(hills) }),]
+
+
+
+let scrollOffset = 0
+
+const init = () => {
+  platformImage = createImage(platform)
+
+  player = new Player()
+  platforms = [
+    new Platform({ x: -1, y: 470, image: platformImage }),
+
+    new Platform({ x: platformImage.width - 3, y: 470, image: platformImage }),
+    new Platform({ x: platformImage.width * 2 + 100, y: 470, image: platformImage }),]
+
+  genericObjects = [new GenericObject({ x: -1, y: -1, image: createImage(background) }), new GenericObject({ x: -1, y: -1, image: createImage(hills) }),]
+
+  scrollOffset = 0
+}
+
 
 const keys = {
   right: {
@@ -90,8 +112,6 @@ const keys = {
     pressed: false
   },
 }
-
-let scrollOffset = 0
 
 const animate = () => {
   requestAnimationFrame(animate)
@@ -133,6 +153,7 @@ const animate = () => {
     }
   }
 
+  // platform collision detection
   platforms.forEach(platform => {
     if (player.position.y + player.height <= platform.position.y &&
       player.position.y + player.height + player.velocity.y >= platform.position.y &&
@@ -142,13 +163,18 @@ const animate = () => {
     }
   })
 
+  // win condition
   if (scrollOffset > 2000) {
     console.log('you win')
   }
+
+  // lose condition
+  if (player.position.y > canvas.height) {
+    console.log('you lose')
+    init()
+  }
+
 }
-
-
-
 
 animate()
 
@@ -168,7 +194,10 @@ addEventListener('keydown', ({ code }) => {
 
     case 'KeyW':
     case 'ArrowUp':
-      player.velocity.y -= 20
+
+      if (player.velocity.y === 0) {
+        player.velocity.y -= 20
+      }
       break
 
     case 'KeyS':
@@ -193,7 +222,7 @@ addEventListener('keyup', ({ code }) => {
 
     case 'KeyW':
     case 'ArrowUp':
-      player.velocity.y += 20
+      player.velocity.y = 0
       break
 
     case 'KeyS':
