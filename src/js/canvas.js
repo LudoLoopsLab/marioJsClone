@@ -2,6 +2,11 @@ import hills from '../img/hills.png'
 import background from '../img/background.png'
 import platform from '../img/platform.png'
 import platformSmallTall from '../img/platformSmallTall.png'
+import spriteRunLeft from '../img/spriteRunLeft.png'
+import spriteRunRight from '../img/spriteRunRight.png'
+import spriteStandLeft from '../img/spriteStandLeft.png'
+import spriteStandRight from '../img/spriteStandRight.png'
+
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
@@ -21,15 +26,43 @@ class Player {
       x: 0,
       y: 0
     }
-    this.width = 30
-    this.height = 30
 
+    this.width = 66
+    this.height = 150
+
+    this.image = createImage(spriteStandRight)
+    this.frame = 0
+
+    this.sprites = {
+      stand: {
+        right: createImage(spriteStandRight),
+        left: createImage(spriteStandLeft),
+        cropWidth: 177,
+        width: 66
+      },
+      run: {
+        right: createImage(spriteRunRight),
+        left: createImage(spriteRunLeft),
+        cropWidth: 341,
+        width: 127.875
+      }
+    }
+
+    this.currentSprite = this.sprites.stand.right
+    this.currentCropWidth = this.sprites.stand.cropWidth
   }
   draw() {
-    c.fillStyle = 'red'
-    c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    c.drawImage(
+      this.currentSprite,
+      this.currentCropWidth * this.frame,
+      0, this.currentCropWidth, 400, this.position.x, this.position.y, this.width, this.height)
   }
+
   update() {
+    this.frame++
+    if (this.frame > 59 && (this.currentSprite === this.sprites.stand.right || this.currentSprite === this.sprites.stand.left)) { this.frame = 0 }
+    else if (this.frame > 29 && (this.currentSprite === this.sprites.run.right || this.currentSprite === this.sprites.run.left)) this.frame = 0
+
     this.draw()
     this.position.x += this.velocity.x
     this.position.y += this.velocity.y
@@ -105,6 +138,7 @@ const init = () => {
   scrollOffset = 0
 }
 
+let lastKey
 
 const keys = {
   right: {
@@ -117,6 +151,7 @@ const keys = {
 
 
 init()
+
 const animate = () => {
   requestAnimationFrame(animate)
   c.fillStyle = 'white'
@@ -171,6 +206,33 @@ const animate = () => {
     }
   })
 
+  // sprite switching
+
+  if (keys.right.pressed &&
+    lastKey == 'right' && player.currentSprite !== player.sprites.run.right) {
+    player.frame = 1
+    player.currentSprite = player.sprites.run.right
+    player.currentCropWidth = player.sprites.run.cropWidth
+    player.width = player.sprites.run.width
+  } else if (keys.left.pressed && lastKey == 'left' && player.currentSprite !== player.sprites.run.left) {
+
+    player.currentSprite = player.sprites.run.left
+    player.frame = 1
+    player.currentCropWidth = player.sprites.run.cropWidth
+    player.width = player.sprites.run.width
+  } else if (!keys.right.pressed && lastKey == 'right' && player.currentSprite !== player.sprites.stand.right) {
+
+    player.currentSprite = player.sprites.stand.right
+    player.currentCropWidth = player.sprites.stand.cropWidth
+    player.width = player.sprites.stand.width
+  } else if (!keys.left.pressed && lastKey == 'left' && player.currentSprite !== player.sprites.stand.left) {
+
+    player.currentSprite = player.sprites.stand.left
+    player.currentCropWidth = player.sprites.stand.cropWidth
+    player.width = player.sprites.stand.width
+  }
+
+
   // win condition
   if (scrollOffset > platformImage.width * 5 + 350 - 2) {
     console.log('you win')
@@ -193,11 +255,14 @@ addEventListener('keydown', ({ code }) => {
     case 'KeyA':
     case 'ArrowLeft':
       keys.left.pressed = true
+      lastKey = 'left'
       break
 
     case 'KeyD':
     case 'ArrowRight':
       keys.right.pressed = true
+      lastKey = 'right'
+
       break
 
     case 'KeyW':
@@ -221,11 +286,14 @@ addEventListener('keyup', ({ code }) => {
     case 'KeyA':
     case 'ArrowLeft':
       keys.left.pressed = false
+      lastKey = 'left'
       break
+
 
     case 'KeyD':
     case 'ArrowRight':
       keys.right.pressed = false
+      lastKey = 'right'
       break
 
     case 'KeyW':
@@ -235,5 +303,7 @@ addEventListener('keyup', ({ code }) => {
     case 'KeyS':
     case 'ArrowDown':
       break
+
+
   }
 })
